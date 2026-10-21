@@ -1,0 +1,46 @@
+{
+  "code": "delivery",
+  "name": "Parcel Delivery",
+  "description": "Book a parcel delivery. Express delivery costs extra and is limited to 50 km.",
+  "definition": {
+    "dataSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["distanceKm", "weightKg"],
+      "properties": {
+        "distanceKm": {"type": "number", "minimum": 0, "maximum": 500, "title": "Distance (km)"},
+        "weightKg": {"type": "number", "exclusiveMinimum": 0, "maximum": 30, "title": "Weight (kg)"},
+        "express": {"type": "boolean", "title": "Express delivery"},
+        "notes": {"type": "string", "maxLength": 500}
+      }
+    },
+    "rules": [
+      {
+        "id": "express-max-distance",
+        "type": "assert",
+        "when": {"==": [{"var": "express"}, true]},
+        "assert": {"<=": [{"var": "distanceKm"}, 50]},
+        "path": "/distanceKm",
+        "message": {"en": "Express delivery is only available up to 50 km."}
+      }
+    ],
+    "fees": [
+      {"code": "BASE", "label": {"en": "Delivery"}, "amount": 5000, "currency": "KHR"},
+      {
+        "code": "EXPRESS",
+        "label": {"en": "Express surcharge"},
+        "amount": 3000,
+        "currency": "KHR",
+        "when": {"==": [{"var": "express"}, true]}
+      }
+    ],
+    "uiSchema": {
+      "steps": [
+        {"id": "parcel", "title": {"en": "Parcel"}, "fields": ["distanceKm", "weightKg", "express"]},
+        {"id": "extras", "title": {"en": "Anything else?"}, "fields": ["notes"]}
+      ],
+      "fields": {"express": {"widget": "switch"}, "notes": {"widget": "textarea"}}
+    }
+  }
+}
