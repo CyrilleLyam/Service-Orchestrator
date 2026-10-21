@@ -1,0 +1,106 @@
+{
+  "code": "equipment-rental",
+  "name": "Equipment Rental",
+  "description": "Rent camera, lighting or audio equipment, with optional insurance and delivery.",
+  "definition": {
+    "dataSchema": {
+      "$schema": "https://json-schema.org/draft/2020-12/schema",
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["equipmentCategory", "durationDays", "startDate"],
+      "properties": {
+        "equipmentCategory": {"enum": ["camera", "lighting", "audio"]},
+        "durationDays": {"type": "integer", "minimum": 1, "maximum": 30},
+        "startDate": {"type": "string", "format": "date"},
+        "insurance": {"type": "boolean"},
+        "delivery": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["address"],
+          "properties": {
+            "address": {"type": "string", "minLength": 5, "maxLength": 300},
+            "phone": {"type": "string", "pattern": "^\\+?[0-9 ]{6,20}$"}
+          }
+        }
+      }
+    },
+    "rules": [
+      {
+        "id": "long-rentals-insured",
+        "type": "assert",
+        "when": {">": [{"var": "durationDays"}, 14]},
+        "assert": {"==": [{"var": "insurance"}, true]},
+        "path": "/insurance",
+        "message": {"en": "Rentals longer than 14 days must be insured."}
+      }
+    ],
+    "fees": [
+      {
+        "code": "CAMERA",
+        "label": {"en": "Camera kit, per day"},
+        "currency": "KHR",
+        "when": {"==": [{"var": "equipmentCategory"}, "camera"]},
+        "perUnit": {"unitAmount": 60000, "quantity": {"var": "durationDays"}}
+      },
+      {
+        "code": "LIGHTING",
+        "label": {"en": "Lighting kit, per day"},
+        "currency": "KHR",
+        "when": {"==": [{"var": "equipmentCategory"}, "lighting"]},
+        "perUnit": {"unitAmount": 40000, "quantity": {"var": "durationDays"}}
+      },
+      {
+        "code": "AUDIO",
+        "label": {"en": "Audio kit, per day"},
+        "currency": "KHR",
+        "when": {"==": [{"var": "equipmentCategory"}, "audio"]},
+        "perUnit": {"unitAmount": 30000, "quantity": {"var": "durationDays"}}
+      },
+      {
+        "code": "SERVICE",
+        "label": {"en": "Preparation and cleaning"},
+        "currency": "KHR",
+        "tiers": {
+          "basis": {"var": "durationDays"},
+          "brackets": [
+            {"upTo": 3, "amount": 5000},
+            {"upTo": 7, "amount": 8000},
+            {"unitAmount": 1000}
+          ]
+        }
+      },
+      {
+        "code": "INSURANCE",
+        "label": {"en": "Damage insurance, 10% of the rental"},
+        "currency": "KHR",
+        "when": {"==": [{"var": "insurance"}, true]},
+        "formula": {
+          "*": [
+            0.1,
+            {"var": "durationDays"},
+            {"if": [
+              {"==": [{"var": "equipmentCategory"}, "camera"]}, 60000,
+              {"==": [{"var": "equipmentCategory"}, "lighting"]}, 40000,
+              30000
+            ]}
+          ]
+        },
+        "rounding": "up",
+        "minAmount": 15000
+      },
+      {
+        "code": "DELIVERY",
+        "label": {"en": "Delivery add-on"},
+        "amount": 8000,
+        "currency": "KHR",
+        "when": {"!!": [{"var": "delivery.address"}]}
+      }
+    ],
+    "uiSchema": {
+      "steps": [
+        {"id": "rental", "title": {"en": "Rental"}, "fields": ["equipmentCategory", "durationDays", "startDate"]},
+        {"id": "extras", "title": {"en": "Add-ons"}, "fields": ["insurance", "delivery.address", "delivery.phone"]}
+      ]
+    }
+  }
+}

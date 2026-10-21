@@ -1,0 +1,47 @@
+[project]
+name = "service-orchestrator"
+version = "0.1.0"
+description = "Schema-driven platform for defining, publishing, validating and processing configurable services."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "alembic>=1.14",
+    "fastapi>=0.115",
+    "jsonschema>=4.23",
+    "psycopg[binary]>=3.2",
+    "pydantic-settings>=2.6",
+    "rfc3339-validator>=0.1.4",
+    "sqlalchemy>=2.0.36",
+    "uvicorn[standard]>=0.32",
+]
+
+[project.scripts]
+service-orchestrator-seed = "service_orchestrator.seed:main"
+
+[dependency-groups]
+dev = [
+    "httpx>=0.28",
+    "pytest>=8.3",
+    "ruff>=0.8",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/service_orchestrator"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["integration: requires a PostgreSQL database (TEST_DATABASE_URL)"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+"migrations/env.py" = ["F401"]
