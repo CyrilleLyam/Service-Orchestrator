@@ -16,7 +16,7 @@ services:
       - pgdata:/var/lib/postgresql/data
 
   api:
-    build: .
+    build: ./backend
     environment:
       DATABASE_URL: postgresql+psycopg://orchestrator:orchestrator@db:5432/service_orchestrator
     depends_on:
