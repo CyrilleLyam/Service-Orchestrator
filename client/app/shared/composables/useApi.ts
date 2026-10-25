@@ -1,5 +1,5 @@
 import axios from 'axios'
-import type { ApiFailure, Envelope, JsonObject } from '#layers/shared/app/types/api'
+import type { ApiFailure, Envelope, JsonObject } from '~/shared/types/api'
 
 export class ApiError extends Error {
   constructor(public detail: ApiFailure) {

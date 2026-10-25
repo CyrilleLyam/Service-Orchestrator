@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ApplicationWorkspace from '#layers/applications/app/components/ApplicationWorkspace.vue'
+import ApplicationWorkspace from '~/features/applications/components/ApplicationWorkspace.vue'
 </script>
 
 <template>

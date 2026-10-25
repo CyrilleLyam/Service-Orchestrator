@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { Fees } from '#layers/shared/app/types/api'
+import type { Fees } from '~/shared/types/api'
 
 defineProps<{ fees: Fees }>()
 </script>

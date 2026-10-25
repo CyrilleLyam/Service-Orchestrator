@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ServiceCatalog from '#layers/catalog/app/components/ServiceCatalog.vue'
+import ServiceCatalog from '~/features/catalog/components/ServiceCatalog.vue'
 </script>
 
 <template>

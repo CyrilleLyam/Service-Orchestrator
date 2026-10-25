@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useApi } from '#layers/shared/app/composables/useApi'
-import type { Service, ServiceSummary } from '#layers/shared/app/types/api'
-import ApiFeedback from '#layers/shared/app/components/ApiFeedback.vue'
+import { useApi } from '~/shared/composables/useApi'
+import type { Service, ServiceSummary } from '~/shared/types/api'
+import ApiFeedback from '~/shared/components/ApiFeedback.vue'
 
 const api = useApi()
 const page = ref(1)

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { parseObject, useApi } from '#layers/shared/app/composables/useApi'
-import type { Application, Quote, Service, Validation, Version } from '#layers/shared/app/types/api'
-import ApiFeedback from '#layers/shared/app/components/ApiFeedback.vue'
-import FeeSummary from '#layers/shared/app/components/FeeSummary.vue'
+import { parseObject, useApi } from '~/shared/composables/useApi'
+import type { Application, Quote, Service, Validation, Version } from '~/shared/types/api'
+import ApiFeedback from '~/shared/components/ApiFeedback.vue'
+import FeeSummary from '~/shared/components/FeeSummary.vue'
 
 const props = defineProps<{ code: string }>()
 const emit = defineEmits<{ applicationCreated: [id: string] }>()

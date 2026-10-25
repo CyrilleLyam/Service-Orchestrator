@@ -26,17 +26,16 @@ Validation and quotes target the current published service version. Applications
 
 ```text
 app/                         # Shell, routes, cross-feature navigation
-layers/shared/app/           # API transport, contracts, feedback and fee UI
-layers/catalog/app/          # Services, version definitions, validation and quotes
-layers/applications/app/     # Application lookup, patch, submit and audit history
+app/features/catalog/        # Services, version definitions, validation and quotes
+app/features/applications/   # Application lookup, patch, submit and audit history
+app/shared/                  # API transport, contracts, feedback and fee UI
+app/assets/css/              # Global styles
 server/api/backend/          # Same-origin FastAPI proxy
 ```
 
-Local Nuxt layers are discovered automatically. Each feature depends only on shared; the root coordinates feature navigation. Project components and composables use explicit `#layers/<feature>/app/...` imports. ESLint enforces feature boundaries and rejects root aliases and parent-relative imports inside layers. Nuxt/Vue helpers and Nuxt UI components remain available through framework/module imports.
+Features live under `app/features/` and depend on `app/shared/`. Pages coordinate routing and cross-feature navigation. Components and composables use explicit `~/features/...` and `~/shared/...` imports. Nuxt/Vue helpers and Nuxt UI components remain available through framework/module imports.
 
-This follows the [Nuxt Layers modular monolith guide](https://alexop.dev/posts/nuxt-layers-modular-monolith/), adapted to Nuxt 4's `app/` layout. The ESLint plugin has a small compatibility adapter for the `getFilename` API removed in ESLint 10.
-
-To add a feature, create `layers/<feature>/nuxt.config.ts`, put its UI under `app/`, register its allowed dependencies in `eslint.config.mjs`, and add a Tailwind `@source` in the shared stylesheet. Restart the dev server after changing layer configuration.
+To add a feature, create `app/features/<feature>/`, keep its UI and supporting code together, and add route wrappers under `app/pages/`. Shared code must not depend on features. ESLint enforces these boundaries. Global styles scan the app directory for Tailwind classes.
 
 ## Verification and production
 

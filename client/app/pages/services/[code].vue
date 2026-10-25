@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import ServiceWorkspace from '#layers/catalog/app/components/ServiceWorkspace.vue'
+import ServiceWorkspace from '~/features/catalog/components/ServiceWorkspace.vue'
 
 const route = useRoute()
 </script>

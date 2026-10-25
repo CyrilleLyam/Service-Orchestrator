@@ -5,7 +5,7 @@ import vm from 'node:vm'
 import ts from 'typescript'
 import axios from 'axios'
 
-const source = await readFile(new URL('../layers/shared/app/composables/useApi.ts', import.meta.url), 'utf8')
+const source = await readFile(new URL('../app/shared/composables/useApi.ts', import.meta.url), 'utf8')
 const compiled = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2022 } }).outputText
 function setup(adapter = async () => ({}), headers = {}) {
   const exports = {}

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ApiError } from '#layers/shared/app/composables/useApi'
+import { ApiError } from '~/shared/composables/useApi'
 
 const props = defineProps<{ error: unknown }>()
 const detail = computed(() => props.error instanceof ApiError ? props.error.detail : null)
