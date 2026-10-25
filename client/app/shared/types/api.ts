@@ -12,3 +12,5 @@ export interface Validation { serviceCode: string, version: number, valid: boole
 export interface Quote { serviceCode: string, version: number, fees: Fees }
 export interface Application { id: string, serviceCode: string, serviceVersion: number, status: string, data: JsonObject, fees: Fees | null, createdAt: string, updatedAt: string, submittedAt: string | null }
 export interface ApplicationDetail extends Application { events: { id: number | null, type: string, metadata: JsonObject, createdAt: string }[] }
+
+export interface ApplicationSummary { id: string, serviceCode: string, serviceVersion: number, status: 'draft' | 'submitted', createdAt: string, updatedAt: string, submittedAt: string | null }

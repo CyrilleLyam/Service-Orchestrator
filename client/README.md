@@ -18,7 +18,7 @@ Open http://localhost:3000. The shared API helper uses an Axios instance per set
 
 - **Service catalog (`/`):** paginated services, publication status, service creation.
 - **Service workspace (`/services/:code`):** inspect versions, create/edit draft definitions, publish, validate payloads, request fee quotes and create application drafts. Definitions and payloads use JSON object editors to support arbitrary backend schemas. Server field errors include JSON Pointer paths and request IDs.
-- **Applications (`/applications?id=:uuid`):** load by ID, inspect saved data, apply JSON Merge Patch updates, submit, review immutable fee snapshots and audit history. The backend has no application-list endpoint; keep the application URL to resume later.
+- **Applications (`/applications`):** browse a paginated list, filter by exact service code and draft/submitted status, open an application or load it by ID, apply JSON Merge Patch updates, submit, and review immutable fee snapshots and audit history. Filters and pagination stay in the URL when opening an application and returning to the list. Lists show summaries newest first, with each application’s pinned service version.
 
 Validation and quotes target the current published service version. Applications are pinned at creation and the backend validates/prices them against that pinned version on submission. Application creation retains an idempotency key for retries of the same payload. Published versions and submitted applications are read-only. Fee amounts are displayed explicitly as raw minor units, preserving the backend contract.
 

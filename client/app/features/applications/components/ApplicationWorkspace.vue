@@ -3,6 +3,7 @@ import { parseObject, useApi } from '~/shared/composables/useApi'
 import type { Application, ApplicationDetail } from '~/shared/types/api'
 import ApiFeedback from '~/shared/components/ApiFeedback.vue'
 import FeeSummary from '~/shared/components/FeeSummary.vue'
+import ApplicationList from '~/features/applications/components/ApplicationList.vue'
 
 const api = useApi()
 const route = useRoute()
@@ -35,7 +36,7 @@ function load() {
     if (!/^[\da-f]{8}-[\da-f]{4}-[\da-f]{4}-[\da-f]{4}-[\da-f]{12}$/i.test(id.value.trim())) throw new Error('Enter a valid application UUID.')
     await reload()
     patch.value = '{}'
-    await navigateTo({ path: '/applications', query: { id: application.value!.id } }, { replace: true })
+    await navigateTo({ path: '/applications', query: { ...route.query, id: application.value!.id } }, { replace: true })
   })
 }
 function save() {
@@ -58,7 +59,13 @@ onMounted(() => {
   if (id.value) load()
 })
 watch(() => route.query.id, (value) => {
-  if (typeof value === 'string' && value !== application.value?.id) {
+  if (typeof value !== 'string') {
+    application.value = null
+    id.value = ''
+    patch.value = '{}'
+    error.value = null
+    notice.value = ''
+  } else if (value !== application.value?.id) {
     id.value = value
     load()
   }
@@ -73,9 +80,17 @@ watch(() => route.query.id, (value) => {
       </p><h1 class="mt-2 text-3xl font-bold">
         Applications
       </h1><p class="mt-2 text-muted">
-        Resume a draft or inspect a submitted application by its ID.
+        Browse applications, resume a draft, or inspect a submitted application.
       </p>
     </div>
+    <UButton
+      v-if="route.query.id"
+      :to="{ path: '/applications', query: { ...route.query, id: undefined } }"
+      label="Back to applications"
+      icon="i-lucide-arrow-left"
+      variant="link"
+    />
+    <ApplicationList v-else />
     <form
       class="flex flex-wrap items-end gap-3"
       @submit.prevent="load"
@@ -107,7 +122,7 @@ watch(() => route.query.id, (value) => {
       v-if="!application && !busy"
       class="text-sm text-muted"
     >
-      Create an application from a published service in the catalog. The backend retrieves applications by ID and does not provide an application list.
+      You can also open an application directly by its ID.
     </p>
     <template v-if="application">
       <UCard>

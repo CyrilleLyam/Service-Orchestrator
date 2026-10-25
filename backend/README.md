@@ -109,6 +109,7 @@ request across systems, or one is generated.
 | POST | `/v1/services/{code}/versions/{version}/publish` | Check and publish an immutable version |
 | POST | `/v1/services/{code}/validate` | Validate a payload against the current version (always 200; see `valid`) |
 | POST | `/v1/services/{code}/quote` | Informational fee quote (422 if the payload is invalid) |
+| GET | `/v1/applications` | Paginated summaries, newest first; optional `serviceCode` and `status=draft\|submitted` filters |
 | POST | `/v1/applications` | Create a draft pinned to the current version; honours `Idempotency-Key` |
 | PATCH | `/v1/applications/{id}` | JSON Merge Patch of the draft: `{"data": {...}}`, `null` removes a field |
 | POST | `/v1/applications/{id}/submit` | Validate, price, submit |

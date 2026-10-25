@@ -6,8 +6,12 @@ from uuid import UUID
 
 from pydantic import Field
 
+from service_orchestrator.application_processing.application.queries.list_applications import (
+    ApplicationSummary,
+)
 from service_orchestrator.application_processing.application.views import ApplicationView
 from service_orchestrator.application_processing.domain.entities import ApplicationEvent
+from service_orchestrator.application_processing.domain.value_objects import ApplicationStatus
 from service_orchestrator.shared.presentation.schemas import ApiModel, FeeBreakdownOut
 
 
@@ -76,3 +80,25 @@ def _fields(view: ApplicationView) -> dict[str, Any]:
         "updated_at": application.updated_at,
         "submitted_at": application.submitted_at,
     }
+
+
+class ApplicationSummaryOut(ApiModel):
+    id: UUID
+    service_code: str
+    service_version: int
+    status: ApplicationStatus
+    created_at: datetime
+    updated_at: datetime
+    submitted_at: datetime | None
+
+    @classmethod
+    def of(cls, summary: ApplicationSummary) -> ApplicationSummaryOut:
+        return cls(
+            id=summary.id,
+            service_code=summary.service_code,
+            service_version=summary.service_version,
+            status=summary.status,
+            created_at=summary.created_at,
+            updated_at=summary.updated_at,
+            submitted_at=summary.submitted_at,
+        )

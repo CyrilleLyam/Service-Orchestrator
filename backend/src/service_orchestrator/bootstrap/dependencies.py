@@ -19,6 +19,12 @@ from service_orchestrator.application_processing.application.commands.update_dra
 from service_orchestrator.application_processing.application.queries.get_application import (
     GetApplication,
 )
+from service_orchestrator.application_processing.application.queries.list_applications import (
+    ListApplications,
+)
+from service_orchestrator.application_processing.infrastructure.application_list import (
+    SqlAlchemyApplicationListReader,
+)
 from service_orchestrator.application_processing.infrastructure.catalog_gateway import (
     CatalogGateway,
 )
@@ -126,6 +132,9 @@ class Container:
         return SubmitApplication(
             self.application_uow(), self.catalog_gateway(), self.payload_checker, self.clock
         )
+
+    def list_applications(self) -> ListApplications:
+        return ListApplications(SqlAlchemyApplicationListReader(self.session_factory))
 
     def get_application(self) -> GetApplication:
         return GetApplication(self.application_uow(), self.catalog_gateway())
