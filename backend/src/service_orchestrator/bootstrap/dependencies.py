@@ -16,6 +16,10 @@ from service_orchestrator.application_processing.application.commands.submit_app
 from service_orchestrator.application_processing.application.commands.update_draft import (
     UpdateApplicationDraft,
 )
+from service_orchestrator.application_processing.application.queries.evaluate_application import (
+    QuoteApplication,
+    ValidateApplication,
+)
 from service_orchestrator.application_processing.application.queries.get_application import (
     GetApplication,
 )
@@ -135,6 +139,14 @@ class Container:
 
     def list_applications(self) -> ListApplications:
         return ListApplications(SqlAlchemyApplicationListReader(self.session_factory))
+
+    def validate_application(self) -> ValidateApplication:
+        return ValidateApplication(
+            self.application_uow(), self.catalog_gateway(), self.payload_checker, self.limits
+        )
+
+    def quote_application(self) -> QuoteApplication:
+        return QuoteApplication(self.validate_application())
 
     def get_application(self) -> GetApplication:
         return GetApplication(self.application_uow(), self.catalog_gateway())

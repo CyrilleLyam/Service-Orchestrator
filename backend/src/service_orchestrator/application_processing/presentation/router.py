@@ -15,7 +15,10 @@ from service_orchestrator.application_processing.domain.value_objects import App
 from service_orchestrator.application_processing.presentation.schemas import (
     ApplicationDetailOut,
     ApplicationOut,
+    ApplicationPreviewRequest,
+    ApplicationQuoteOut,
     ApplicationSummaryOut,
+    ApplicationValidationOut,
     CreateApplicationRequest,
     PatchApplicationRequest,
 )
@@ -95,3 +98,27 @@ def get_application(
     application_id: UUID, container: ContainerDep
 ) -> ApiResponse[ApplicationDetailOut]:
     return ok(ApplicationDetailOut.of(container.get_application().execute(application_id)))
+
+
+@router.post("/{application_id}/validate")
+def validate_application(
+    application_id: UUID,
+    container: ContainerDep,
+    body: ApplicationPreviewRequest | None = None,
+) -> ApiResponse[ApplicationValidationOut]:
+    result = container.validate_application().execute(
+        application_id, body.data if body is not None else None
+    )
+    return ok(ApplicationValidationOut.of(result))
+
+
+@router.post("/{application_id}/quote")
+def quote_application(
+    application_id: UUID,
+    container: ContainerDep,
+    body: ApplicationPreviewRequest | None = None,
+) -> ApiResponse[ApplicationQuoteOut]:
+    result = container.quote_application().execute(
+        application_id, body.data if body is not None else None
+    )
+    return ok(ApplicationQuoteOut.of(result))

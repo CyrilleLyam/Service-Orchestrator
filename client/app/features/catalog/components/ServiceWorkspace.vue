@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { parseObject, useApi } from '~/shared/composables/useApi'
+import { ApiError, parseObject, useApi } from '~/shared/composables/useApi'
 import type { Application, Quote, Service, Validation, Version } from '~/shared/types/api'
 import ApiFeedback from '~/shared/components/ApiFeedback.vue'
 import FeeSummary from '~/shared/components/FeeSummary.vue'
+import ApplicationDataEditor from '~/shared/components/ApplicationDataEditor.vue'
 
 const props = defineProps<{ code: string }>()
 const emit = defineEmits<{ applicationCreated: [id: string] }>()
@@ -18,6 +19,7 @@ const error = shallowRef<unknown>(null)
 const notice = ref('')
 const validation = ref<Validation | null>(null)
 const quote = ref<Quote | null>(null)
+const fieldErrors = computed(() => error.value instanceof ApiError ? error.value.detail.errors : validation.value?.errors ?? [])
 const creationKey = ref('')
 const creationBody = ref('')
 async function run(action: () => Promise<void>) {
@@ -88,6 +90,11 @@ function createApplication() {
   })
 }
 watch(payload, () => {
+  validation.value = null
+  quote.value = null
+  error.value = null
+})
+watch(() => service.value?.published?.version, () => {
   validation.value = null
   quote.value = null
 })
@@ -180,14 +187,19 @@ watch(payload, () => {
             <p class="text-sm text-muted">
               Validation and quotes use the current published version. A new application is pinned to that version.
             </p>
-            <UFormField label="Application data JSON">
-              <UTextarea
-                v-model="payload"
-                :rows="12"
-                class="w-full font-mono"
-                spellcheck="false"
-              />
-            </UFormField>
+            <ApplicationDataEditor
+              v-if="service.published"
+              v-model="payload"
+              :definition="service.published.definition"
+              :errors="fieldErrors"
+              :disabled="busy"
+            />
+            <p
+              v-else
+              class="text-sm text-muted"
+            >
+              Publish a service version to fill in an application form.
+            </p>
             <div class="flex flex-wrap gap-2">
               <UButton
                 label="Validate"

@@ -6,13 +6,21 @@ from uuid import UUID
 
 from pydantic import Field
 
+from service_orchestrator.application_processing.application.queries.evaluate_application import (
+    ApplicationCheckResult,
+    ApplicationFeeQuote,
+)
 from service_orchestrator.application_processing.application.queries.list_applications import (
     ApplicationSummary,
 )
 from service_orchestrator.application_processing.application.views import ApplicationView
 from service_orchestrator.application_processing.domain.entities import ApplicationEvent
 from service_orchestrator.application_processing.domain.value_objects import ApplicationStatus
-from service_orchestrator.shared.presentation.schemas import ApiModel, FeeBreakdownOut
+from service_orchestrator.shared.presentation.schemas import (
+    ApiModel,
+    FeeBreakdownOut,
+    FieldErrorOut,
+)
 
 
 class CreateApplicationRequest(ApiModel):
@@ -101,4 +109,38 @@ class ApplicationSummaryOut(ApiModel):
             created_at=summary.created_at,
             updated_at=summary.updated_at,
             submitted_at=summary.submitted_at,
+        )
+
+
+class ApplicationPreviewRequest(ApiModel):
+    data: dict[str, Any] = Field(description="Replacement data to preview without saving.")
+
+
+class ApplicationValidationOut(ApiModel):
+    service_code: str
+    version: int
+    valid: bool
+    errors: list[FieldErrorOut]
+
+    @classmethod
+    def of(cls, result: ApplicationCheckResult) -> ApplicationValidationOut:
+        return cls(
+            service_code=result.service_code,
+            version=result.version,
+            valid=result.evaluation.valid,
+            errors=[FieldErrorOut.of(error) for error in result.evaluation.errors],
+        )
+
+
+class ApplicationQuoteOut(ApiModel):
+    service_code: str
+    version: int
+    fees: FeeBreakdownOut
+
+    @classmethod
+    def of(cls, result: ApplicationFeeQuote) -> ApplicationQuoteOut:
+        return cls(
+            service_code=result.service_code,
+            version=result.version,
+            fees=FeeBreakdownOut.of(result.fees),
         )

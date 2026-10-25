@@ -5,8 +5,8 @@ without writing new backend code for each one. A service is **configuration data
 for its payload, declarative rules, fees and UI hints. New services and new versions go live through
 the API; nothing is redeployed.
 
-This is the proof of concept described in the project brief (backend milestones M1–M5; the optional
-React/Next.js renderer is not built yet).
+This is the proof of concept described in the project brief (backend milestones M1–M5), with a
+schema-driven Nuxt frontend in `../client`.
 
 - **Architecture:** modular monolith, pragmatic DDD, Clean Architecture
 - **Stack:** Python 3.12, FastAPI, PostgreSQL (JSONB), SQLAlchemy 2, Alembic, uv
@@ -112,6 +112,8 @@ request across systems, or one is generated.
 | GET | `/v1/applications` | Paginated summaries, newest first; optional `serviceCode` and `status=draft\|submitted` filters |
 | POST | `/v1/applications` | Create a draft pinned to the current version; honours `Idempotency-Key` |
 | PATCH | `/v1/applications/{id}` | JSON Merge Patch of the draft: `{"data": {...}}`, `null` removes a field |
+| POST | `/v1/applications/{id}/validate` | Validate a draft against its pinned version without saving |
+| POST | `/v1/applications/{id}/quote` | Quote draft fees against its pinned version without saving |
 | POST | `/v1/applications/{id}/submit` | Validate, price, submit |
 | GET | `/v1/applications/{id}` | Application, fee snapshot and audit events |
 
@@ -140,6 +142,12 @@ Field errors use JSON Pointers into the document that was checked:
 | 413 | request body over `MAX_REQUEST_BYTES` |
 | 422 | malformed request, invalid definition on publish, invalid payload on quote/submit |
 | 500 | unexpected error; the body has the `requestId` to find it in the logs |
+
+### Draft previews
+
+`POST /v1/applications/{id}/validate` and `/quote` use the application’s pinned service version even after a newer version is published. Omit the body (or send JSON `null`) to check saved answers; send `{"data": {...}}` to preview a complete replacement object, including unsaved edits. An empty data object is checked as empty rather than falling back to saved answers. Previews do not update data, timestamps, fee snapshots or audit events.
+
+Validation returns `serviceCode`, `version`, `valid` and field `errors`. Quotes return `serviceCode`, `version` and `fees`; invalid data returns 422 with field errors. Missing applications return 404 and submitted applications return 409. Payload size and nesting limits apply. To render a draft form, read `/v1/services/{serviceCode}/versions/{serviceVersion}` using the version reported by the application.
 
 ## Definition contract
 
